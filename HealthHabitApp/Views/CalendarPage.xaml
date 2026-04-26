@@ -1,12 +1,260 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HealthHabitApp.ViewModels"
              x:Class="HealthHabitApp.Views.CalendarPage"
-             Title="CalendarPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title=""
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <ContentPage.BindingContext>
+        <vm:CalendarViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Header -->
+            <Grid BackgroundColor="{StaticResource Primary}"
+                  Padding="20,50,20,24">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="History"
+                           FontSize="26"
+                           FontAttributes="Bold"
+                           TextColor="White"
+                           FontFamily="OpenSansSemibold"/>
+                    <Label Text="Track your progress over time"
+                           FontSize="13"
+                           TextColor="#CCFFD6"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Stats Row -->
+            <Grid Padding="16,16,16,0" ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Completion Rate -->
+                <Border Grid.Column="0"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1" Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 14" Padding="12,14">
+                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                        <Label Text="{Binding CompletionRateText}"
+                               FontSize="24" FontAttributes="Bold"
+                               TextColor="{StaticResource Primary}"
+                               HorizontalOptions="Center"
+                               FontFamily="OpenSansSemibold"/>
+                        <Label Text="This Month"
+                               FontSize="11"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Completed Days -->
+                <Border Grid.Column="1"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1" Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 14" Padding="12,14">
+                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                        <Label Text="{Binding CompletedThisMonth}"
+                               FontSize="24" FontAttributes="Bold"
+                               TextColor="{StaticResource Accent}"
+                               HorizontalOptions="Center"
+                               FontFamily="OpenSansSemibold"/>
+                        <Label Text="Days Done"
+                               FontSize="11"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Longest Streak -->
+                <Border Grid.Column="2"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1" Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 14" Padding="12,14">
+                    <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                        <HorizontalStackLayout HorizontalOptions="Center" Spacing="2">
+                            <Label Text="🔥" FontSize="16" VerticalOptions="Center"/>
+                            <Label Text="{Binding LongestStreak}"
+                                   FontSize="24" FontAttributes="Bold"
+                                   TextColor="{StaticResource StreakColor}"
+                                   FontFamily="OpenSansSemibold"/>
+                        </HorizontalStackLayout>
+                        <Label Text="Best Streak"
+                               FontSize="11"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <!-- Calendar Card -->
+            <Border BackgroundColor="{StaticResource CardBackground}"
+                    StrokeThickness="1" Stroke="{StaticResource BorderColor}"
+                    StrokeShape="RoundRectangle 16"
+                    Margin="16,16,16,0" Padding="16,14">
+                <VerticalStackLayout Spacing="14">
+
+                    <!-- Month Navigation -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                BackgroundColor="{StaticResource SurfaceColor}"
+                                StrokeThickness="0"
+                                StrokeShape="Ellipse"
+                                WidthRequest="36" HeightRequest="36">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding PreviousMonthCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="‹" FontSize="20" TextColor="{StaticResource TextPrimary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+
+                        <Label Grid.Column="1"
+                               Text="{Binding MonthYearLabel}"
+                               FontSize="16" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"
+                               HorizontalOptions="Center" VerticalOptions="Center"
+                               FontFamily="OpenSansSemibold"/>
+
+                        <Border Grid.Column="2"
+                                BackgroundColor="{StaticResource SurfaceColor}"
+                                StrokeThickness="0"
+                                StrokeShape="Ellipse"
+                                WidthRequest="36" HeightRequest="36">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding NextMonthCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="›" FontSize="20" TextColor="{StaticResource TextPrimary}"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- Day of Week Headers -->
+                    <Grid ColumnSpacing="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Text="S" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                        <Label Grid.Column="1" Text="M" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                        <Label Grid.Column="2" Text="T" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                        <Label Grid.Column="3" Text="W" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                        <Label Grid.Column="4" Text="T" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                        <Label Grid.Column="5" Text="F" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                        <Label Grid.Column="6" Text="S" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" HorizontalOptions="Center"/>
+                    </Grid>
+
+                    <!-- Calendar Grid -->
+                    <CollectionView ItemsSource="{Binding CalendarDays}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical"
+                                             Span="7"
+                                             HorizontalItemSpacing="4"
+                                             VerticalItemSpacing="4"/>
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CalendarDay">
+                                <Border StrokeThickness="0"
+                                        StrokeShape="Ellipse"
+                                        WidthRequest="36"
+                                        HeightRequest="36"
+                                        BackgroundColor="{Binding BackgroundColor}"
+                                        HorizontalOptions="Center">
+                                    <Label Text="{Binding Day}"
+                                           FontSize="13"
+                                           TextColor="{Binding TextColor}"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           FontAttributes="Bold"/>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Legend -->
+                    <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+                        <HorizontalStackLayout Spacing="6">
+                            <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="{StaticResource Primary}"/>
+                            <Label Text="Today" FontSize="11" TextColor="{StaticResource TextMuted}"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="{StaticResource PrimaryLight}"/>
+                            <Label Text="Completed" FontSize="11" TextColor="{StaticResource TextMuted}"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <BoxView WidthRequest="12" HeightRequest="12" CornerRadius="6" Color="#FEE2E2"/>
+                            <Label Text="Missed" FontSize="11" TextColor="{StaticResource TextMuted}"/>
+                        </HorizontalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Habit Stats -->
+            <VerticalStackLayout Padding="16,16,16,8" Spacing="0">
+                <Label Text="Habit Breakdown"
+                       FontSize="18" FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       FontFamily="OpenSansSemibold"
+                       Margin="0,0,0,12"/>
+
+                <CollectionView ItemsSource="{Binding HabitStats}" SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:HabitStat">
+                            <Border BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1" Stroke="{StaticResource BorderColor}"
+                                    StrokeShape="RoundRectangle 14" Padding="14,12">
+                                <VerticalStackLayout Spacing="10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="36"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Grid.Column="0" Text="{Binding Icon}" FontSize="22" VerticalOptions="Center"/>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center" Margin="8,0,0,0">
+                                            <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}" FontFamily="OpenSansSemibold"/>
+                                            <Label Text="{Binding StreakText}" FontSize="12" TextColor="{StaticResource StreakColor}"/>
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="2" Text="{Binding CompletionText}"
+                                               FontSize="18" FontAttributes="Bold"
+                                               TextColor="{StaticResource Primary}"
+                                               VerticalOptions="Center"
+                                               FontFamily="OpenSansSemibold"/>
+                                    </Grid>
+                                    <ProgressBar Progress="{Binding CompletionRate}"
+                                                 ProgressColor="{StaticResource Primary}"
+                                                 BackgroundColor="{StaticResource PrimaryLight}"
+                                                 HeightRequest="6"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <BoxView HeightRequest="80" Color="Transparent"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

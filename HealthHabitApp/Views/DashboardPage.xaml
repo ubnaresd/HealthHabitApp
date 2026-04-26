@@ -1,12 +1,232 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HealthHabitApp.ViewModels"
              x:Class="HealthHabitApp.Views.DashboardPage"
-             Title="Dashboard">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title=""
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <ContentPage.BindingContext>
+        <vm:DashboardViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Header Banner -->
+            <Grid BackgroundColor="{StaticResource Primary}"
+                  Padding="20,50,20,28">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Greeting & Add Button -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                        <Label Text="{Binding GreetingText}" 
+                               FontSize="13"
+                               TextColor="#CCFFD6"
+                               FontFamily="OpenSansRegular"/>
+                        <Label Text="{Binding DateText}"
+                               FontSize="22"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               FontFamily="OpenSansSemibold"/>
+                    </VerticalStackLayout>
+
+                    <!-- Add Habit Button -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="#17A849"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 22"
+                            Padding="14,10"
+                            VerticalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToAddHabitCommand}"/>
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Text="+" FontSize="18" TextColor="White" FontAttributes="Bold" VerticalOptions="Center"/>
+                            <Label Text="Add" FontSize="14" TextColor="White" FontFamily="OpenSansSemibold" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Progress Section -->
+                <Grid Grid.Row="1" Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <VerticalStackLayout Grid.Column="0" Spacing="8">
+                        <Label Text="{Binding ProgressText}"
+                               FontSize="14"
+                               TextColor="#CCFFD6"
+                               FontFamily="OpenSansRegular"/>
+                        <ProgressBar Progress="{Binding CompletionProgress}"
+                                     ProgressColor="White"
+                                     BackgroundColor="#17A849"
+                                     HeightRequest="8"/>
+                    </VerticalStackLayout>
+
+                    <!-- Completion Circle -->
+                    <Border Grid.Column="1"
+                            BackgroundColor="#17A849"
+                            StrokeThickness="2"
+                            Stroke="White"
+                            StrokeShape="Ellipse"
+                            WidthRequest="64"
+                            HeightRequest="64"
+                            Margin="16,0,0,0">
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="0">
+                            <Label Text="{Binding CompletedCount}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="White"
+                                   HorizontalOptions="Center"/>
+                            <Label Text="done"
+                                   FontSize="10"
+                                   TextColor="#CCFFD6"
+                                   HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- Today's Habits Section -->
+            <VerticalStackLayout Padding="16,20,16,8" Spacing="0">
+                <Label Text="Today's Habits"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       FontFamily="OpenSansSemibold"
+                       Margin="0,0,0,12"/>
+
+                <!-- Habits List -->
+                <CollectionView ItemsSource="{Binding TodayHabits}"
+                                SelectionMode="None">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Vertical" ItemSpacing="10"/>
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="vm:HabitDisplayItem">
+                            <Border BackgroundColor="{StaticResource CardBackground}"
+                                    StrokeThickness="1"
+                                    Stroke="{StaticResource BorderColor}"
+                                    StrokeShape="RoundRectangle 16"
+                                    Padding="16,14">
+                                <Grid ColumnSpacing="14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="44"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Icon Circle -->
+                                    <Border Grid.Column="0"
+                                            StrokeThickness="0"
+                                            StrokeShape="Ellipse"
+                                            WidthRequest="44"
+                                            HeightRequest="44"
+                                            BackgroundColor="{StaticResource PrimaryLight}">
+                                        <Label Text="{Binding Icon}"
+                                               FontSize="20"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Border>
+
+                                    <!-- Name & Streak -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               FontFamily="OpenSansSemibold"/>
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding FrequencyLabel}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource TextMuted}"/>
+                                            <Label Text="·"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource TextMuted}"/>
+                                            <Label Text="{Binding StreakText}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource StreakColor}"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+
+                                    <!-- Complete Toggle -->
+                                    <Border Grid.Column="2"
+                                            StrokeThickness="2"
+                                            StrokeShape="Ellipse"
+                                            WidthRequest="36"
+                                            HeightRequest="36"
+                                            VerticalOptions="Center">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsCompleted}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource Primary}"/>
+                                                <Setter Property="Stroke" Value="{StaticResource Primary}"/>
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsCompleted}" Value="False">
+                                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                                <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:DashboardViewModel}}, Path=ToggleHabitCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+                                        <Label FontSize="16"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsCompleted}" Value="True">
+                                                    <Setter Property="Text" Value="✓"/>
+                                                    <Setter Property="TextColor" Value="White"/>
+                                                </DataTrigger>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsCompleted}" Value="False">
+                                                    <Setter Property="Text" Value=""/>
+                                                    <Setter Property="TextColor" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Empty State -->
+                <VerticalStackLayout IsVisible="{Binding TodayHabits.Count, Converter={x:StaticResource IntToBoolConverter}}"
+                                     HorizontalOptions="Center"
+                                     Spacing="12"
+                                     Padding="0,40">
+                    <Label Text="🌱" FontSize="48" HorizontalOptions="Center"/>
+                    <Label Text="No habits yet!"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Tap + Add to create your first habit"
+                           FontSize="14"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <!-- Bottom padding -->
+                <BoxView HeightRequest="80" Color="Transparent"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

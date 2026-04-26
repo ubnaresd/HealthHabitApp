@@ -1,12 +1,215 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:HealthHabitApp.ViewModels"
              x:Class="HealthHabitApp.Views.AddHabitPage"
-             Title="AddHabitPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title=""
+             BackgroundColor="{StaticResource PageBackground}">
+
+    <ContentPage.BindingContext>
+        <vm:AddHabitViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Top Header Bar -->
+            <Grid BackgroundColor="{StaticResource Primary}"
+                  Padding="16,50,16,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Back Button -->
+                <Border Grid.Column="0"
+                        BackgroundColor="#17A849"
+                        StrokeThickness="0"
+                        StrokeShape="Ellipse"
+                        WidthRequest="36" HeightRequest="36">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CancelCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="←" FontSize="18" TextColor="White"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+                <Label Grid.Column="1"
+                       Text="{Binding PageTitle}"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       FontFamily="OpenSansSemibold"/>
+            </Grid>
+
+            <!-- Form Card -->
+            <VerticalStackLayout Padding="16,20,16,16" Spacing="16">
+
+                <!-- Habit Name -->
+                <Border BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Habit Name"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}"
+                               FontFamily="OpenSansSemibold"/>
+                        <Entry Placeholder="e.g. Morning Run, Read 30 mins..."
+                               Text="{Binding HabitName}"
+                               FontSize="16"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextMuted}"
+                               BackgroundColor="Transparent"/>
+                        <Label Text="{Binding NameError}"
+                               FontSize="12"
+                               TextColor="#EF4444"
+                               IsVisible="{Binding HasNameError}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Category / Emoji Picker -->
+                <Border BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Category"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}"
+                               FontFamily="OpenSansSemibold"/>
+                        <CollectionView ItemsSource="{Binding EmojiOptions}"
+                                        SelectionMode="None"
+                                        HeightRequest="80">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:EmojiOption">
+                                    <Border StrokeShape="RoundRectangle 12"
+                                            StrokeThickness="2"
+                                            WidthRequest="64"
+                                            HeightRequest="70"
+                                            Padding="4">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource PrimaryLight}"/>
+                                                <Setter Property="Stroke" Value="{StaticResource Primary}"/>
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="False">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceColor}"/>
+                                                <Setter Property="Stroke" Value="{StaticResource BorderColor}"/>
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer 
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddHabitViewModel}}, Path=SelectEmojiCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+                                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="2">
+                                            <Label Text="{Binding Emoji}" FontSize="22" HorizontalOptions="Center"/>
+                                            <Label Text="{Binding Label}" FontSize="9" TextColor="{StaticResource TextSecondary}" HorizontalOptions="Center"/>
+                                        </VerticalStackLayout>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Frequency -->
+                <Border BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Frequency"
+                               FontSize="13"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}"
+                               FontFamily="OpenSansSemibold"/>
+                        <Picker ItemsSource="{Binding FrequencyOptions}"
+                                SelectedItem="{Binding SelectedFrequency}"
+                                FontSize="16"
+                                TextColor="{StaticResource TextPrimary}"
+                                TitleColor="{StaticResource TextMuted}"
+                                BackgroundColor="Transparent"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Reminder Time -->
+                <Border BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="1"
+                        Stroke="{StaticResource BorderColor}"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,14">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Text="Reminder Time"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   FontFamily="OpenSansSemibold"
+                                   VerticalOptions="Center"/>
+                            <Switch Grid.Column="1"
+                                    IsToggled="{Binding NotificationsEnabled}"
+                                    OnColor="{StaticResource Primary}"/>
+                        </Grid>
+                        <TimePicker Time="{Binding ReminderTime}"
+                                    FontSize="16"
+                                    TextColor="{StaticResource TextPrimary}"
+                                    BackgroundColor="Transparent"
+                                    IsEnabled="{Binding NotificationsEnabled}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Save Button -->
+                <Border BackgroundColor="{StaticResource Primary}"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16"
+                        Margin="0,8,0,0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SaveHabitCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Grid Padding="16,18">
+                        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                           IsVisible="{Binding IsBusy}"
+                                           Color="White"
+                                           HorizontalOptions="Center"/>
+                        <Label Text="{Binding SaveBtnText}"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="White"
+                               HorizontalOptions="Center"
+                               FontFamily="OpenSansSemibold"
+                               IsVisible="{Binding IsBusy, Converter={x:StaticResource InverseBoolConverter}}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Cancel -->
+                <Label Text="Cancel"
+                       FontSize="15"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalOptions="Center"
+                       Margin="0,4,0,40">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding CancelCommand}"/>
+                    </Label.GestureRecognizers>
+                </Label>
+
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

@@ -3,31 +3,43 @@
     x:Class="HealthHabitApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:HealthHabitApp"
     xmlns:views="clr-namespace:HealthHabitApp.Views"
     Shell.FlyoutBehavior="Disabled"
     Title="HealthHabitApp">
 
+    <Shell.Resources>
+        <Style TargetType="TabBar">
+            <Setter Property="Shell.TabBarBackgroundColor" Value="White"/>
+            <Setter Property="Shell.TabBarForegroundColor" Value="#1DB954"/>
+            <Setter Property="Shell.TabBarUnselectedColor" Value="#9CA3AF"/>
+            <Setter Property="Shell.TabBarTitleColor" Value="#1DB954"/>
+        </Style>
+    </Shell.Resources>
+
     <TabBar>
         <ShellContent
-            Title="Dashboard"
+            Title="Home"
+            Icon="home.png"
             ContentTemplate="{DataTemplate views:DashboardPage}"
             Route="dashboard" />
 
         <ShellContent
-            Title="Calendar"
+            Title="History"
+            Icon="calendar.png"
             ContentTemplate="{DataTemplate views:CalendarPage}"
             Route="calendar" />
 
-        <ShellContent   
+        <ShellContent
             Title="Profile"
+            Icon="profile.png"
             ContentTemplate="{DataTemplate views:ProfilePage}"
             Route="profile" />
 
-        <ShellContent 
+        <ShellContent
             Title="Settings"
+            Icon="settings.png"
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="settings" />
     </TabBar>
-    
+
 </Shell>
