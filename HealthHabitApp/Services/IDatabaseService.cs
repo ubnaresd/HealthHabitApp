@@ -15,5 +15,7 @@ namespace HealthHabitApp.Services
 
         Task<UserProfile> GetUserProfileAsync();
         Task<int> SaveUserProfileAsync(UserProfile profile);
+        // Delete all stored data (habits and profiles)
+        Task ClearAllDataAsync();
     }
 }

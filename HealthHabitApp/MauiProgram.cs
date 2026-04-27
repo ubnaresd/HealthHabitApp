@@ -24,13 +24,19 @@ public static class MauiProgram
         builder.UseLocalNotification();
 #endif
 
-        // Update this line to use IAppNotificationService
+        // Register services
+        builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
         builder.Services.AddSingleton<IAppNotificationService, NotificationService>();
 
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+
+        // store the service provider for use by code-behind pages that need to resolve services
+        App.Services = app.Services;
+
+        return app;
     }
 }

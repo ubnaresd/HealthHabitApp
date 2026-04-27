@@ -1,9 +1,12 @@
 ﻿using System;
+using SQLite;
 
 namespace HealthHabitApp.Models
 {
+    [Table("Habits")]
     public class Habit
     {
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         public string Name { get; set; }
         public TimeSpan ReminderTime { get; set; }

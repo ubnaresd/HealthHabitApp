@@ -105,16 +105,30 @@ namespace HealthHabitApp.ViewModels
 
                 if (_database != null)
                 {
-                    await _database.SaveHabitAsync(habit);
+                    // save and obtain id (DatabaseService returns the id)
+                    var id = await _database.SaveHabitAsync(habit);
+                    if (id > 0) habit.Id = id;
                 }
 
-                if (NotificationsEnabled && _notificationService != null)
+                if (_notificationService != null)
                 {
-                    await _notificationService.ScheduleDailyHabitReminderAsync(
-                        habit.Id > 0 ? habit.Id : 1,
-                        "Habit Reminder",
-                        $"Time to complete: {habit.Name}",
-                        ReminderTime);
+                    // try to request permission (harmless on platforms where not required)
+                    await _notificationService.RequestPermissionsAsync();
+
+                    // if editing an existing habit, cancel previous reminder first to avoid duplicates
+                    if (EditingHabitId > 0)
+                    {
+                        _notificationService.CancelReminder(habit.Id);
+                    }
+
+                    if (NotificationsEnabled)
+                    {
+                        await _notificationService.ScheduleDailyHabitReminderAsync(
+                            habit.Id > 0 ? habit.Id : 1,
+                            "Habit Reminder",
+                            $"Time to complete: {habit.Name}",
+                            ReminderTime);
+                    }
                 }
 
                 IsSaved = true;

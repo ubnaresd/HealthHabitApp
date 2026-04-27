@@ -113,15 +113,67 @@ namespace HealthHabitApp.ViewModels
         private async Task ToggleHabit(HabitDisplayItem item)
         {
             if (item == null) return;
-            item.IsCompleted = !item.IsCompleted;
-            // In full app: update DB here
-            RefreshStats();
+
+            var newState = !item.IsCompleted;
+            item.IsCompleted = newState;
+
+            if (_database == null)
+            {
+                RefreshStats();
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+
+                var habit = await _database.GetHabitByIdAsync(item.Id);
+                if (habit != null)
+                {
+                    var today = DateTime.Today;
+
+                    if (newState)
+                    {
+                        // mark completed today
+                        if (!habit.LastCompletedDate.HasValue || habit.LastCompletedDate.Value.Date != today)
+                        {
+                            // if last completed was yesterday, increase streak, otherwise start new streak
+                            if (habit.LastCompletedDate.HasValue && habit.LastCompletedDate.Value.Date == today.AddDays(-1))
+                                habit.CurrentStreak = Math.Max(0, habit.CurrentStreak) + 1;
+                            else
+                                habit.CurrentStreak = 1;
+
+                            habit.LastCompletedDate = DateTime.Now;
+                        }
+                    }
+                    else
+                    {
+                        // unmark completion for today
+                        if (habit.LastCompletedDate.HasValue && habit.LastCompletedDate.Value.Date == today)
+                        {
+                            habit.LastCompletedDate = null;
+                            habit.CurrentStreak = Math.Max(0, habit.CurrentStreak - 1);
+                        }
+                    }
+
+                    await _database.SaveHabitAsync(habit);
+
+                    // update display item streak
+                    item.CurrentStreak = habit.CurrentStreak;
+                }
+            }
+            finally
+            {
+                IsBusy = false;
+                RefreshStats();
+            }
         }
 
         [RelayCommand]
         private async Task NavigateToAddHabit()
         {
-            await Shell.Current.GoToAsync("//addhabit");
+            // Navigate to the registered route for AddHabitPage
+            await Shell.Current.GoToAsync("addhabit");
         }
 
         private string GetHabitIcon(string name)

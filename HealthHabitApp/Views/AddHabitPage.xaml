@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:HealthHabitApp.ViewModels"
              x:Class="HealthHabitApp.Views.AddHabitPage"
+             x:Name="Root"
              Title=""
              BackgroundColor="{StaticResource PageBackground}">
 
@@ -110,7 +111,7 @@
                                         </Border.Triggers>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer 
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:AddHabitViewModel}}, Path=SelectEmojiCommand}"
+                                                Command="{Binding Source={x:Reference Root}, Path=BindingContext.SelectEmojiCommand}"
                                                 CommandParameter="{Binding .}"/>
                                         </Border.GestureRecognizers>
                                         <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="2">

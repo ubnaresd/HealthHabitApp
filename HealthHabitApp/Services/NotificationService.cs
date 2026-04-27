@@ -24,6 +24,11 @@ public class NotificationService : IAppNotificationService
     public async Task ScheduleDailyHabitReminderAsync(int habitId, string title, string description, TimeSpan timeOfDay)
     {
 #if ANDROID || IOS
+        // compute the next occurrence of the reminder time
+        var next = DateTime.Today.Add(timeOfDay);
+        if (next <= DateTime.Now)
+            next = next.AddDays(1);
+
         var notification = new NotificationRequest
         {
             NotificationId = habitId,
@@ -31,8 +36,8 @@ public class NotificationService : IAppNotificationService
             Description = description,
             Schedule = new NotificationRequestSchedule
             {
-                NotifyTime = DateTime.Today.Add(timeOfDay),
-                RepeatType = NotificationRepeat.Daily 
+                NotifyTime = next,
+                RepeatType = NotificationRepeat.Daily
             }
         };
 

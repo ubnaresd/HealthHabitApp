@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using HealthHabitApp.Models;
 using HealthHabitApp.Services;
+using System.Linq;
 using System.Collections.ObjectModel;
 
 namespace HealthHabitApp.ViewModels
@@ -45,6 +46,72 @@ namespace HealthHabitApp.ViewModels
             _database = database;
             Title = "History";
             BuildCalendar();
+            // load real stats when database is available
+            _ = LoadStatsAsync();
+        }
+
+        public async Task LoadStatsAsync()
+        {
+            if (_database == null)
+            {
+                LoadSampleStats();
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+                var habits = await _database.GetHabitsAsync();
+
+                // Rebuild calendar for current month
+                BuildCalendar();
+
+                // Clear and compute habit stats
+                HabitStats.Clear();
+
+                int monthCompleted = 0;
+                int monthTotal = 0;
+                int longest = 0;
+
+                foreach (var h in habits.Where(h => h.IsActive))
+                {
+                    // simple completion rate: use CurrentStreak and CreatedAt as heuristics
+                    double completionRate = 0.5;
+                    if (h.CurrentStreak > 0) completionRate = Math.Min(1.0, 0.5 + h.CurrentStreak * 0.05);
+
+                    var stat = new HabitStat
+                    {
+                        Name = h.Name,
+                        Icon = GetHabitIcon(h.Name),
+                        CompletionRate = completionRate,
+                        Streak = h.CurrentStreak
+                    };
+
+                    HabitStats.Add(stat);
+
+                    // For calendar marking: mark LastCompletedDate if it falls within the current month
+                    if (h.LastCompletedDate.HasValue)
+                    {
+                        var d = h.LastCompletedDate.Value.Date;
+                        if (d.Month == _currentMonth.Month && d.Year == _currentMonth.Year)
+                        {
+                            var day = CalendarDays.FirstOrDefault(c => !c.IsEmpty && c.Date.Date == d);
+                            if (day != null) { day.IsCompleted = true; monthCompleted++; }
+                        }
+                    }
+
+                    // For summary counts approximate total days in month
+                    monthTotal += CalendarDays.Count(d => !d.IsEmpty && !d.IsFuture);
+                    longest = Math.Max(longest, h.CurrentStreak);
+                }
+
+                CompletedThisMonth = monthCompleted;
+                TotalHabitsThisMonth = monthTotal;
+                MonthCompletionRate = monthTotal > 0 ? (double)monthCompleted / monthTotal : 0;
+                CompletionRateText = $"{(int)(MonthCompletionRate * 100)}%";
+                LongestStreak = longest;
+            }
+            finally { IsBusy = false; }
         }
 
         private void BuildCalendar()
@@ -68,8 +135,8 @@ namespace HealthHabitApp.ViewModels
                     Date = date,
                     IsToday = date.Date == DateTime.Today,
                     IsFuture = date.Date > DateTime.Today,
-                    // Sample: mark some days as completed for demo
-                    IsCompleted = date.Date < DateTime.Today && d % 3 != 0
+                    // default to not completed; DB marking will set IsCompleted where appropriate
+                    IsCompleted = false
                 });
             }
 
@@ -98,7 +165,7 @@ namespace HealthHabitApp.ViewModels
         {
             _currentMonth = _currentMonth.AddMonths(-1);
             BuildCalendar();
-            LoadSampleStats();
+            // LoadSampleStats();
         }
 
         [RelayCommand]
@@ -110,6 +177,18 @@ namespace HealthHabitApp.ViewModels
                 BuildCalendar();
                 LoadSampleStats();
             }
+        }
+
+        private string GetHabitIcon(string name)
+        {
+            var n = name?.ToLower() ?? "";
+            if (n.Contains("run") || n.Contains("walk") || n.Contains("exercise")) return "🏃";
+            if (n.Contains("read") || n.Contains("book")) return "📚";
+            if (n.Contains("water") || n.Contains("drink")) return "💧";
+            if (n.Contains("meditat")) return "🧘";
+            if (n.Contains("sleep")) return "😴";
+            if (n.Contains("diet") || n.Contains("eat") || n.Contains("food")) return "🥗";
+            return "✨";
         }
     }
 

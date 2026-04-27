@@ -7,6 +7,7 @@ namespace HealthHabitApp.ViewModels
     public partial class SettingsViewModel : BaseViewModel
     {
         private readonly IAppNotificationService _notificationService;
+        private readonly IDatabaseService _database;
 
         [ObservableProperty]
         private bool notificationsEnabled = true;
@@ -28,9 +29,10 @@ namespace HealthHabitApp.ViewModels
             Title = "Settings";
         }
 
-        public SettingsViewModel(IAppNotificationService notificationService)
+        public SettingsViewModel(IAppNotificationService notificationService, IDatabaseService database)
         {
             _notificationService = notificationService;
+            _database = database;
             Title = "Settings";
         }
 
@@ -59,6 +61,11 @@ namespace HealthHabitApp.ViewModels
                 "Delete", "Cancel");
             if (confirm)
             {
+                if (_database != null)
+                {
+                    await _database.ClearAllDataAsync();
+                }
+
                 await Shell.Current.DisplayAlert("Done", "All data cleared.", "OK");
             }
         }

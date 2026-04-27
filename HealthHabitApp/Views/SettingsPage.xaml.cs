@@ -7,6 +7,7 @@ public partial class SettingsPage : ContentPage
     public SettingsPage()
     {
         InitializeComponent();
-        BindingContext = new SettingsViewModel();
+        var notif = App.Services?.GetService(typeof(HealthHabitApp.Services.IAppNotificationService)) as HealthHabitApp.Services.IAppNotificationService;
+        BindingContext = new SettingsViewModel(notif, App.DatabaseService);
     }
 }
